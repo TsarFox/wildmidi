@@ -1,4 +1,4 @@
-This is a light Rust wrapper around the WildMIDI software synthesizer library.
+This is a simple Rust wrapper around the WildMIDI software synthesizer library.
 
 
 # Examples
@@ -29,3 +29,4 @@ cargo test -- --test-threads=1
 - [x] Implement wrappers for WildMidi_GetInfo.
 - [ ] Implement wrappers for WildMidi_SetOption.
 - [ ] Valid MIDI blob for use in testing 'load' and the methods of 'Midi'.
+- [ ] Compile the WildMIDI C library, or provide more sanity checking to ensure that it's present?

@@ -7,6 +7,11 @@ members = [
 name = "wildmidi"
 version = "0.1.0"
 authors = ["Jakob L. Kreuze <jakob@memeware.net>"]
+
+description = "A simple wrapper around the WildMIDI software synthesizer library."
+repository = "https://github.com/TsarFox/wildmidi"
+license = "LGPL-3.0-or-later"
+
 links = "WildMidi"
 build = "build.rs"
 
