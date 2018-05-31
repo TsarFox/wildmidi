@@ -19,9 +19,19 @@
 extern crate simple_error;
 
 use std::error::Error;
+use std::ffi::CStr;
 use std::ffi::CString;
 use std::os::raw::{c_char, c_uchar, c_ushort, c_int, c_ulong, c_void};
 use std::path::Path;
+
+#[repr(C)]
+struct WM_Info {
+    copyright: *const c_char,
+    current_sample: c_ulong,
+    approx_total_samples: c_ulong,
+    total_midi_time: c_ulong,
+    mixer_options: c_ushort,
+}
 
 extern "C" {
     // "Methods" of the Midi player.
@@ -36,6 +46,7 @@ extern "C" {
     fn WildMidi_Close(ptr: *const c_void) -> c_int;
     fn WildMidi_FastSeek(ptr: *const c_void, pos: c_ushort) -> c_int;
     fn WildMidi_GetOutput(ptr: *const c_void, buf: *mut c_uchar, len: c_ulong) -> c_int;
+    fn WildMidi_GetInfo(ptr: *const c_void) -> *const WM_Info;
 }
 
 /// Loader for the Midi format.
@@ -92,7 +103,7 @@ impl Player {
         Ok(Player { })
     }
 
-    // TODO: Document this.
+    /// Sets the overall library volume level. The default is 100.
     pub fn volume(&mut self, volume: u8) -> Result<(), Box<Error>> {
         unsafe {
             if WildMidi_MasterVolume(volume) != 0 {
@@ -182,11 +193,60 @@ impl Midi {
         vec
     }
 
-    // TODO: Document this.
+    /// Resets all note specific midi states and active notes before scanning to
+    /// sample_pos samples from the beginning taking note of any changes to midi
+    /// channel states.
     pub fn seek(&mut self, pos: u32) {
         unsafe {
             // FIXME: Doesn't check return value.
             WildMidi_FastSeek(self.ptr, pos as c_ushort);
+        }
+    }
+
+    /// Returns a string containing any copyright MIDI events, if any were
+    /// found.
+    pub fn copyright(&self) -> Option<String> {
+        unsafe {
+            let ptr = WildMidi_GetInfo(self.ptr);
+
+            if (*ptr).copyright.is_null() {
+                None
+            } else {
+                if let Ok(str) = CStr::from_ptr((*ptr).copyright).to_str() {
+                    Some(String::from(str))
+                } else {
+                    None
+                }
+            }
+        }
+    }
+
+    /// The number of stereo samples the player has processed so far. Dividing
+    /// this value by the player's 'rate' determines the current playing time.
+    pub fn current_sample(&self) -> usize {
+        unsafe {
+            let ptr = WildMidi_GetInfo(self.ptr);
+            (*ptr).current_sample as usize
+        }
+    }
+
+    /// The number of stereo samples the player expects to process. Dividing
+    /// this value by the player's 'rate' determines the MIDI's total length.
+    pub fn total_samples(&self) -> usize {
+        unsafe {
+            let ptr = WildMidi_GetInfo(self.ptr);
+            (*ptr).approx_total_samples as usize
+        }
+    }
+
+    /// This is the total time of MIDI events in 1/1000's of a second. It
+    /// differs from 'total_samples' in that it only states the total time
+    /// within the MIDI file, and does not take into account the extra bit of
+    /// time to finish playing sampling smoothly.
+    pub fn total_time(&self) -> usize {
+        unsafe {
+            let ptr = WildMidi_GetInfo(self.ptr);
+            (*ptr).total_midi_time as usize
         }
     }
 }

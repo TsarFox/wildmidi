@@ -9,7 +9,7 @@ features.
 
 ```
 $ cd examples/player/
-$ cargo run /tmp/D_E1A1.MID
+$ cargo run D_E1A1.MID
 ```
 
 
@@ -26,5 +26,6 @@ cargo test -- --test-threads=1
 
 # TODO
 
-- [ ] Implement a wrapper for WildMidi_SetOption.
+- [x] Implement wrappers for WildMidi_GetInfo.
+- [ ] Implement wrappers for WildMidi_SetOption.
 - [ ] Valid MIDI blob for use in testing 'load' and the methods of 'Midi'.
