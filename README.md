@@ -26,4 +26,5 @@ cargo test -- --test-threads=1
 
 # TODO
 
+- [ ] Implement a wrapper for WildMidi_SetOption.
 - [ ] Valid MIDI blob for use in testing 'load' and the methods of 'Midi'.
