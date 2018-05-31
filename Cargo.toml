@@ -1,0 +1,14 @@
+[workspace]
+members = [
+    "examples/player",
+]
+
+[package]
+name = "wildmidi"
+version = "0.1.0"
+authors = ["Jakob L. Kreuze <jakob@memeware.net>"]
+links = "WildMidi"
+build = "build.rs"
+
+[dependencies]
+simple-error = "0.1"

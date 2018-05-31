@@ -1,0 +1,8 @@
+[package]
+name = "wildmidi-player"
+version = "0.1.0"
+authors = ["Jakob L. Kreuze <jakob@memeware.net>"]
+
+[dependencies]
+ao_rs = "0.1.5"
+wildmidi = { path = "../../", version = "0.1" }
